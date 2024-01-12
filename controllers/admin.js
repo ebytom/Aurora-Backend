@@ -98,7 +98,7 @@ module.exports.getTransactions = catchAsyncError(async (req, res) => {
 
         const transactions = await instance.payments.all();
 
-        res.json({ [transactions]: transactions.items });
+        res.json({ transactions });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to retrieve transactions' });
