@@ -59,19 +59,22 @@ module.exports.getRevenue = catchAsyncError(async (req, res) => {
         const monthStart = Math.floor(startOfMonth / 1000); // Start of the current month
         const startOfDay = new Date(new Date().setHours(0, 0, 0, 0));
         const todayStart = Math.floor(startOfDay / 1000); // Start of the current day
+        const startOfYear = new Date(new Date().getFullYear(), 0, 1);
+        const yearStart = Math.floor(startOfYear / 1000);
 
 
         // Fetch payments for each time period
         const todayPayments = await instance.payments.all({ from: todayStart, to: now });
         const monthlyPayments = await instance.payments.all({ from: monthStart, to: now });
-        const allPayments = await instance.payments.all();
+        const yearlyPayments = await instance.payments.all({ from: yearStart, to: now });
+
 
         // Calculate revenue for each period
         const todayRevenue = calculateRevenue(todayPayments);
         const monthlyRevenue = calculateRevenue(monthlyPayments);
-        const totalRevenue = calculateRevenue(allPayments);
+        const yearlyRevenue = calculateRevenue(yearlyPayments);
 
-        res.json({ todayRevenue, monthlyRevenue, totalRevenue });
+        res.json({ todayRevenue, monthlyRevenue, yearlyRevenue });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to retrieve payments' });
@@ -83,5 +86,5 @@ function calculateRevenue(payments) {
     for (const payment of payments.items) {
         total += payment.amount;
     }
-    return total/100;
+    return total / 100;
 }
