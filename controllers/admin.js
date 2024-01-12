@@ -88,3 +88,19 @@ function calculateRevenue(payments) {
     }
     return total / 100;
 }
+
+module.exports.getTransactions = catchAsyncError(async (req, res) => {
+    try {
+        const instance = new Razorpay({
+            key_id: process.env.RAZORPAY_KEY_ID,
+            key_secret: process.env.RAZORPAY_KEY_SECRET
+        });
+
+        const transactions = await instance.payments.all();
+
+        res.json({ transactions });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to retrieve transactions' });
+    }
+});
